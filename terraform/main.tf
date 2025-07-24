@@ -15,8 +15,7 @@ data "oci_identity_availability_domains" "ads" {
 data "oci_core_images" "ubuntu" {
   compartment_id           = local.compartment_ocid
   operating_system         = "Canonical Ubuntu"
-  operating_system_version = "24.04"
-  most_recent              = true
+  operating_system_version = "24.04"S
   shape                    = "VM.Standard.E2.1.Micro"
 }
 

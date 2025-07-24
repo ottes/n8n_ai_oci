@@ -1,5 +1,7 @@
 # 🚀 Deploy n8n on Oracle Cloud Free Tier
 
+# OTTES TODO: merge with https://github.com/n8n-io/self-hosted-ai-starter-kit
+
 This guide helps you deploy [n8n](https://n8n.io) for free on Oracle Cloud using the Always Free Tier with an ARM-based VM.
 You don’t need a domain name or SSL, but both can be added optionally for production use.
 

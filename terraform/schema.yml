@@ -3,3 +3,12 @@
   description: Paste your SSH public key to access the virtual machine via SSH
   required: true
 
+- name: availability_domain_index
+  title: Availability Domain Index
+  description: Index of the Availability Domain (e.g. 0, 1, 2)
+  required: true
+
+- name: tenancy_ocid
+  title: Tenancy OCID
+  description: OCID of Oracle Cloud Tenancy
+  required: true

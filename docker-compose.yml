@@ -3,12 +3,80 @@ services:
     image: n8nio/n8n
     restart: unless-stopped
     container_name: n8n
+    hostname: n8n
     ports:
       - "5678:5678"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      - GENERIC_TIMEZONE=Europe/Madrid
+      - NODE_ENV=production
+      - GENERIC_TIMEZONE=Europe/Berlin
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=strongpassword
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_USER=root
+      - DB_POSTGRESDB_PASSWORD=strongpgpassword
+      - N8N_ENCRYPTION_KEY
+      - N8N_USER_MANAGEMENT_JWT_SECRET
+      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_HIRING_BANNER_ENABLED=false
+      - N8N_REINSTALL_MISSING_PACKAGES=true
+      - OLLAMA_HOST=${OLLAMA_HOST:-ollama:11434}
     volumes:
       - ./n8n_data:/home/node/.n8n
+      - ./shared:/data/shared
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - 11434:11434
+    volumes:
+      - ollama_storage:/root/.ollama
+
+  init-ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-pull-llama
+    depends_on:
+      - ollama
+    volumes:
+      - ollama_storage:/root/.ollama
+    entrypoint: /bin/sh
+    environment:
+      - OLLAMA_HOST=ollama:11434
+    command:
+      - "-c"
+      - "sleep 3; ollama pull llama3.2"
+
+  postgres:
+    image: postgres:16-alpine
+    hostname: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=strongpgpassword
+      - POSTGRES_DB=n8n
+    volumes:
+      - postgres_storage:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant
+    hostname: qdrant
+    container_name: qdrant
+    networks: ['demo']
+    restart: unless-stopped
+    ports:
+      - 6333:6333
+    volumes:
+      - qdrant_storage:/qdrant/storage
+

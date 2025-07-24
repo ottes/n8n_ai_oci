@@ -8,3 +8,9 @@ variable "ssh_public_key" {
   type        = string
 }
 
+variable "availability_domain_index" {
+  description = "Index der Availability Domain (z.B. 0, 1, 2)"
+  type        = number
+  default     = 0
+}
+
